@@ -1,0 +1,33 @@
+spring:
+  r2dbc:
+    url: ${R2DBC_URL:r2dbc:postgresql://db:5432/transports_db}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres_pass}
+    pool:
+      initial-size: 10
+      max-size: 50
+
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://db:5432/transports_db}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres_pass}
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  sql:
+    init:
+      mode: never
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        baseConfig: default
+        minimumNumberOfCalls: 3
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 2
+        ignoreExceptions:
+          - org.scoooting.transport.exceptions.DataNotFoundException
